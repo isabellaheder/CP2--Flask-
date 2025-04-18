@@ -1,0 +1,45 @@
+# version: '3.9' # versão do docker compose
+
+# fluxo:
+    # flask_db é iniciado primeiro, configurando um db postgreSQL com as credenciais definidas
+    # dados são armazenados no volume pgdata
+
+    # depois o flask_app é iniciado, por conta do depends_on
+    # flask_app usa DB_URL para conectar no postgres (flask_db)
+
+    # a aplicação flask é acessada no navegador na URL http://localhost:5000
+    # o banco de dados é acessado na URL localhost:5432 (porta padrão do postgres) 
+
+
+services:
+  flask_app: # aplicação flask
+    container_name: flask_app # nome do container
+    image: isabella/flask_app_img:1.0.0 # imagem usada, se não existir localmente o o docker vai tentar baixar do docker hub
+    
+    build: . # imagem vai ser criada localmente nesse diretório (que tem o dockerfile)
+    ports: # mapeia as portas container:host
+      - "5000:5000"
+    
+    environment: # define variáveis de ambiente
+      # a variavel DB_URL aponta do db postgres que tá no container flask_db
+      # host é o flask_db, porta padrão postgres: 5432, usuario postgres, senha password e db postgres
+      - DB_URL=postgresql://postgres:password@flask_db:5432/postgres 
+    
+    depends_on:
+      - flask_db # flask_app depende do db, iniciando primeiro o flask_db e dps o app
+    
+  flask_db: # banco de dados postgres
+    container_name: flask_db
+    image: postgres # imagem do postgres versão 15
+    ports:
+      - "5432:5432"
+
+    environment:
+      - POSTGRES_USER=postgres # usuário adm do db
+      - POSTGRES_PASSWORD=password # senha dele
+      - POSTGRES_DB=postgres # nome do db 
+
+    volumes: # se o container for removido, os dados ficam salvos no volume pgdata
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata: {}
