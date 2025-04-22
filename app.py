@@ -1,33 +1,26 @@
 from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from os import environ
-# make_response pacote para lidar com as respostas em python
-# SQLAlchemy p trabalhar com tabelas e banco de dados
-# environ p trabalhar com variáveis de ambiente
-# flask p criar api e aplicação web
-# jsonify p trabalhar com dados em formato json
-# request (SEM 'S') é para requisicões http 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL') # CONEXÃO COM O BANCO DE DADOS
-db = SQLAlchemy(app) # sqlalchemy vai conseguir trabalhar com o app
+app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL') 
+db = SQLAlchemy(app)
 
-# se a variável de ambiente DB_URL não estiver configurada, o app não vai funcionar
 if not app.config['SQLALCHEMY_DATABASE_URI']:
     raise RuntimeError("A variável de ambiente 'DB_URL' não está configurada.")
 
-class User(db.Model): # criando uma tabela para os usuários
-    __tablename__ = 'usuarios' # nome da tabela
+class User(db.Model): 
+    __tablename__ = 'usuarios' 
 
-    id = db.Column(db.Integer, primary_key=True) # id do usuário
-    usuario = db.Column(db.String(80), unique=True, nullable=False) # nome do usuário (não pode ser nulo e tem que ser único)
-    email = db.Column(db.String(120), unique=True, nullable=False) # email do usuário (não pode ser nulo e tem que ser único)
+    id = db.Column(db.Integer, primary_key=True)
+    usuario = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False) 
 
     def json(self):
-        return {'id': self.id, 'usuario': self.usuario, 'email': self.email} # retorna os dados do usuário em formato json
+        return {'id': self.id, 'usuario': self.usuario, 'email': self.email} 
 
-with app.app_context(): # cria um contexto para o app, para poder usar o banco de dados
-    db.create_all() # inicia o database
+with app.app_context(): 
+    db.create_all() 
 
 # ROTA TESTE
 @app.route('/teste', methods=['GET']) # não precisa especificar o método, mas é bom para deixar claro o que a rota faz
@@ -93,18 +86,18 @@ def atualizar_usuario(id):
     except Exception as e:
         print(e) # mostra o erro
         return make_response(jsonify({'mensagem': 'erro ao atualizar usuário'}), 500)
-    
-# # DELETANDO USUÁRIO
-# @app.route('/delete-usuarios/<int:id>', methods=['DELETE']) # rota para deletar um usuário pelo id, usando o método DELETE
-# def deletar_usuario(id):
-#     try:
-#         usuario = User.query.filter_by(id=id).first() # pega o usuário pelo id
-#         if usuario:
-#             db.session.delete(usuario) # deleta o usuário
-#             db.session.commit() # salva as alterações no banco de dados
-#             return make_response(jsonify({'mensagem': 'usuário deletado com sucesso'}), 200) # retorna em json com o status 200 (ok)
-#         return make_response(jsonify({'mensagem': 'usuário não encontrado'}), 404) # se o usuário não for encontrado, retorna erro 404 (não encontrado)
-#     except Exception as e:
-#         print(e)
-#         return make_response(jsonify({'mensagem': 'erro ao deletar usuário'}), 500)
+
+# DELETANDO USUÁRIO
+@app.route('/delete-usuarios/<int:id>', methods=['DELETE']) # rota para deletar um usuário pelo id, usando o método DELETE
+def deletar_usuario(id):
+    try:
+        usuario = User.query.filter_by(id=id).first() # pega o usuário pelo id
+        if usuario:
+            db.session.delete(usuario) # deleta o usuário
+            db.session.commit() # salva as alterações no banco de dados
+            return make_response(jsonify({'mensagem': 'usuário deletado com sucesso'}), 200) # retorna em json com o status 200 (ok)
+        return make_response(jsonify({'mensagem': 'usuário não encontrado'}), 404) # se o usuário não for encontrado, retorna erro 404 (não encontrado)
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'mensagem': 'erro ao deletar usuário'}), 500)
     
