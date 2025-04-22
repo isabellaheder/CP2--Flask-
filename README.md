@@ -5,11 +5,11 @@ Enunciado:
 
 1) Criar um Dockerfile para a aplicação Flask:
 
-Crie um arquivo chamado Dockerfile para construir a imagem Docker da aplicação Flask.
+**Crie um arquivo chamado Dockerfile para construir a imagem Docker da aplicação Flask.
 A imagem deverá ser baseada na imagem oficial do Python.
 O Dockerfile deve instalar o Flask, SQLAlchemy e a biblioteca psycopg2 para conexão com o banco de dados PostgreSQL.
 O Dockerfile deve definir a variável de ambiente FLASK_APP e o comando para iniciar a aplicação (flask run).
----------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------**********-----------
 2)Criar a aplicação Flask com SQLAlchemy:
 
 Crie um arquivo chamado app.py que implementa uma aplicação Flask simples com SQLAlchemy.
